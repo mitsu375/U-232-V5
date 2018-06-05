@@ -22,6 +22,7 @@ require_once INCL_DIR . 'pager_functions.php';
 dbconn(false);
 loggedinorreturn();
 $lang = array_merge(load_language('global') , load_language('uploadapp'));
+if ($CURUSER['class'] < UC_POWER_USER) stderr($lang['uploadapp_error'], lang['uploadapp_users_error2']);
 $HTMLOUT = '';
 // Fill in application
 if (isset($_POST["form"]) != 1) {
