@@ -239,8 +239,12 @@ function format_comment($text, $strip_html = true, $urls = true, $images = true)
         '/\[\*\]\s?(.*?)\n/i',
         '/\[li\]\s?(.*?)\n/i',
         '/\[hr\]/',
+<<<<<<< HEAD
 	    '/\[title\]\s*((\s|.)+?)\s*\[\/title\]/i',
 	    '/\[code\]\s*((\s|.)+?)\s*\[\/code\]/i'
+=======
+	'/\[title\]\s*((\s|.)+?)\s*\[\/title\]/i'
+>>>>>>> 22bafa96cd9f8f5ef549dc4423de65787dc3a7ab
     );
     // And replace them by...
     $bb_code_out = array(
@@ -261,15 +265,23 @@ function format_comment($text, $strip_html = true, $urls = true, $images = true)
         '<font face="\'\1\'">\2</font>',
         '<table cellspacing="0" cellpadding="10"><tr><td class="forum_head_dark" style="padding:5px">Spoiler! to view, roll over the spoiler box.</td></tr><tr><td class="spoiler"><a href="#">\\1</a></td></tr></table><br />',
         '<iframe width="800" height="500" src="https://www.youtube.com/embed/\\1" frameborder="0" allowfullscreen></iframe>',
+<<<<<<< HEAD
         "<embed style=\"width:800px; height:500px;\" id=\"VideoPlayback\" align=\"middle\" type=\"application/x-shockwave-flash\" src=\"http://video.google.com/googleplayer.swf?docId=\\1\" allowScriptAccess=\"sameDomain\" quality=\"best\" bgcolor=\"#ffffff\" scale=\"noScale\" wmode=\"window\" salign=\"TL\"  FlashVars=\"playerMode=embedded\"> </embed>",
+=======
+        "<embed style=\"width:500px; height:410px;\" id=\"VideoPlayback\" align=\"middle\" type=\"application/x-shockwave-flash\" src=\"http://video.google.com/googleplayer.swf?docId=\\1\" allowScriptAccess=\"sameDomain\" quality=\"best\" bgcolor=\"#ffffff\" scale=\"noScale\" wmode=\"window\" salign=\"TL\"  FlashVars=\"playerMode=embedded\"> </embed>",
+>>>>>>> 22bafa96cd9f8f5ef549dc4423de65787dc3a7ab
         '<span style="text-align: center;"><p>Audio From: \1</p><embed type="application/x-shockwave-flash" src="http://www.google.com/reader/ui/3247397568-audio-player.swf?audioUrl=\\1" width="400" height="27" allowscriptaccess="never" quality="best" bgcolor="#ffffff" wmode="window" flashvars="playerMode=embedded" /></span>',
         '<ol class="style" start="\1">\2</ol>',
         '<ul class="style">\1</ul>',
         '<li>\1</li>',
         '<li>\1</li>',
         '<hr />',
+<<<<<<< HEAD
 	    '<font color="red" size="4"><b>\1</b></font>',
 	    '<code class="bbc_code">\1</code>'
+=======
+	'<font color="red" size="4"><b>\1</b></font>'
+>>>>>>> 22bafa96cd9f8f5ef549dc4423de65787dc3a7ab
     );
     $s = preg_replace($bb_code_in, $bb_code_out, $s);
     if ($urls) $s = format_urls($s);
