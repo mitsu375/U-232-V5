@@ -26,7 +26,7 @@ function source_highlighter($source, $lang2geshi)
         "&lt;",
         "&quot;",
         "&amp;",
-	"<br />"
+	    "<br />"
     ) , array(
         "'",
         ">",
@@ -144,9 +144,12 @@ function format_quotes($s)
     $pos = - 1;
     foreach ($closequote as $val) $closeval[] = $pos = strpos($s, $val, $pos + 1);
     for ($i = 0; $i < count($openval); $i++) if ($openval[$i] > $closeval[$i]) return $s; // Cannot close before opening. Return raw string...
-            $s = str_replace("[quote]", "<blockquote><cite>Quote:</cite>", $s);
-			$s = preg_replace("/\\[quote=(.+?)\\]/", "<blockquote><cite>\\1 wrote:</cite>", $s);
-            $s = str_replace("[/quote]", "<br /></blockquote>", $s);
+	      $s = str_replace("[quote]", "<div class='quoteText'><br />", $s);
+//            $s = str_replace("[quote]", "<blockquote><cite>Quote:</cite>", $s);
+			$s = preg_replace("/\\[quote=(.+?)\\]/", "<div class='quoteText'><b>\\1 wrote:</b><br/>", $s);
+//			$s = preg_replace("/\\[quote=(.+?)\\]/", "<blockquote><cite>\\1 wrote:</cite>", $s);
+	      $s = str_replace("[/quote]", "<br /></div>", $s);
+//            $s = str_replace("[/quote]", "<br /></blockquote>", $s);
     return $s;
 }
 function islocal($link)
@@ -166,7 +169,7 @@ function islocal($link)
         $title = trim($link[2]);
         if (false !== stristr($link[2], '[img]')) {
             $flag = true;
-            $title = preg_replace("/\[img]((http|https):\/\/[^\s'\"<>]+(\.(jpg|gif|png)))\[\/img\]/i", "<img src=\"\\1\" alt=\"\" border=\"0\" />", $title);
+            $title = preg_replace("/\[img]((http|https):\/\/[^\s'\"<>]+(\.(jpg|jpeg|gif|png)))\[\/img\]/i", "<img src=\"\\1\" alt=\"\" border=\"0\" />", $title);
         }
     } elseif (false !== stristr($link[0], '[url]')) $url = $title = trim($link[1]);
     else $url = $title = trim($link[2]);
@@ -175,7 +178,7 @@ function islocal($link)
         $l[1] = substr($title, strlen($title) - round($limit / 3));
         $lshort = $l[0] . "..." . $l[1];
     } else $lshort = $title;
-    return "&nbsp;<a href=\"" . ((stristr($url, $INSTALLER09['url']) !== false) ? "" : "http://nullrefer.com/?") . $url . "\" target=\"_blank\">" . $lshort . "</a>";
+    return "&nbsp;<a href=\"" . ((stristr($url, $INSTALLER09['url']) !== false) ? "" : "/redir.php?url=") . $url . "\" target=\"_blank\">" . $lshort . "</a>";
 }
 function format_urls($s)
 {
@@ -215,6 +218,7 @@ function format_comment($text, $strip_html = true, $urls = true, $images = true)
         '/\[b\]\s*((\s|.)+?)\s*\[\/b\]/i',
         '/\[i\]\s*((\s|.)+?)\s*\[\/i\]/i',
         '/\[u\]\s*((\s|.)+?)\s*\[\/u\]/i',
+	    '/\[center\]\s*((\s|.)+?)\s*\[\/center\]/i',
         '/\[email\](.*?)\[\/email\]/i',
         '/\[align=([a-zA-Z]+)\]((\s|.)+?)\[\/align\]/i',
         '/\[blockquote\]\s*((\s|.)+?)\s*\[\/blockquote\]/i',
@@ -234,33 +238,38 @@ function format_comment($text, $strip_html = true, $urls = true, $images = true)
         '/\[list\]((\s|.)+?)\[\/list\]/i',
         '/\[\*\]\s?(.*?)\n/i',
         '/\[li\]\s?(.*?)\n/i',
-        '/\[hr\]/'
+        '/\[hr\]/',
+	    '/\[title\]\s*((\s|.)+?)\s*\[\/title\]/i',
+	    '/\[code\]\s*((\s|.)+?)\s*\[\/code\]/i'
     );
     // And replace them by...
     $bb_code_out = array(
-        '<span style="font-weight: bold;">\1</span>',
-        '<span style="font-style: italic;">\1</span>',
-        '<span style="text-decoration: underline;">\1</span>',
+	    '<strong>\1</strong>',
+	    '<i>\1</i>',
+	    '<u>\1</u>',
+	    '<div style="text-align:center">\1</div>',
         '<a class="altlink" href="mailto:\1">\1</a>',
-        '<div style="text-align: \1;">\2</div>',
+        '<p style="text-align:\1;">\2</p>',
         '<blockquote class="style"><span>\1</span></blockquote>',
         '<span style="text-decoration: line-through;">\1</span>',
         '<span style="text-decoration: line-through;">\1</span>',
         '<marquee class="style">\1</marquee>',
         '<div style="padding-top: 2px; white-space: nowrap"><span style="cursor: hand; cursor: pointer; border-bottom: 1px dotted" onclick="if (document.getElementById(\'collapseobj\1\').style.display==\'block\') {document.getElementById(\'collapseobj\1\').style.display=\'none\' } else { document.getElementById(\'collapseobj\1\').style.display=\'block\' }">\1</span></div><div id="collapseobj\1" style="display:none; padding-top: 2px; padding-left: 14px; margin-bottom:10px; padding-bottom: 2px; background-color: #FEFEF4;">\2</div>',
-        '<span class="size\1">\2</span>',
-        '<span style="color:\1;">\2</span>',
-        '<span style="color:\1;">\2</span>',
-        '<span style="font-family:\'\1\';">\2</span>',
+        '<font size="\1">\2</font>',
+        '<font color="\1">\2</font>',
+        '<font color="\1">\2</font>',
+        '<font face="\'\1\'">\2</font>',
         '<table cellspacing="0" cellpadding="10"><tr><td class="forum_head_dark" style="padding:5px">Spoiler! to view, roll over the spoiler box.</td></tr><tr><td class="spoiler"><a href="#">\\1</a></td></tr></table><br />',
-        '<iframe width="500" height="410" src="https://www.youtube.com/embed/\\1" frameborder="0" allowfullscreen></iframe>',
-        "<embed style=\"width:500px; height:410px;\" id=\"VideoPlayback\" align=\"middle\" type=\"application/x-shockwave-flash\" src=\"http://video.google.com/googleplayer.swf?docId=\\1\" allowScriptAccess=\"sameDomain\" quality=\"best\" bgcolor=\"#ffffff\" scale=\"noScale\" wmode=\"window\" salign=\"TL\"  FlashVars=\"playerMode=embedded\"> </embed>",
+        '<iframe width="800" height="500" src="https://www.youtube.com/embed/\\1" frameborder="0" allowfullscreen></iframe>',
+        "<embed style=\"width:800px; height:500px;\" id=\"VideoPlayback\" align=\"middle\" type=\"application/x-shockwave-flash\" src=\"http://video.google.com/googleplayer.swf?docId=\\1\" allowScriptAccess=\"sameDomain\" quality=\"best\" bgcolor=\"#ffffff\" scale=\"noScale\" wmode=\"window\" salign=\"TL\"  FlashVars=\"playerMode=embedded\"> </embed>",
         '<span style="text-align: center;"><p>Audio From: \1</p><embed type="application/x-shockwave-flash" src="http://www.google.com/reader/ui/3247397568-audio-player.swf?audioUrl=\\1" width="400" height="27" allowscriptaccess="never" quality="best" bgcolor="#ffffff" wmode="window" flashvars="playerMode=embedded" /></span>',
         '<ol class="style" start="\1">\2</ol>',
         '<ul class="style">\1</ul>',
         '<li>\1</li>',
         '<li>\1</li>',
-        '<hr />'
+        '<hr />',
+	    '<font color="red" size="4"><b>\1</b></font>',
+	    '<code class="bbc_code">\1</code>'
     );
     $s = preg_replace($bb_code_in, $bb_code_out, $s);
     if ($urls) $s = format_urls($s);
@@ -288,9 +297,9 @@ function format_comment($text, $strip_html = true, $urls = true, $images = true)
 
     if (stripos($s, '[img') !== false && $images) {
         // [img=http://www/image.gif]
-        $s = preg_replace("/\[img\]((http|https):\/\/[^\s'\"<>]+(\.(jpg|gif|png|bmp)))\[\/img\]/i", "<a href=\"\\1\" rel=\"lightbox\"><img src=\"\\1\" border=\"0\" alt=\"\" style=\"max-width: 150px;\" /></a>", $s);
+        $s = preg_replace("/\[img\]((http|https):\/\/[^\s'\"<>]+(\.(jpg|jpeg|gif|png|bmp)))\[\/img\]/i", "<a href=\"\\1\" rel=\"lightbox\"><img src=\"\\1\" border=\"0\" alt=\"\" style=\"max-width: 600px;\ max-height: 338px;\" /></a>", $s);
         // [img=http://www/image.gif]
-        $s = preg_replace("/\[img=((http|https):\/\/[^\s'\"<>]+(\.(gif|jpg|png|bmp)))\]/i", "<a href=\"\\1\" rel=\"lightbox\"><img src=\"\\1\" border=\"0\" alt=\"\" style=\"max-width: 150px;\" /></a>", $s);
+        $s = preg_replace("/\[img=((http|https):\/\/[^\s'\"<>]+(\.(gif|jpg|jpeg|png|bmp)))\]/i", "<a href=\"\\1\" rel=\"lightbox\"><img src=\"\\1\" border=\"0\" alt=\"\" style=\"max-width: 600px;\ max-height: 338px;\" /></a>", $s);
     }
     // [mcom]Text[/mcom]
     if (stripos($s, '[mcom]') !== false) $s = preg_replace("/\[mcom\](.+?)\[\/mcom\]/is", "<div style=\"font-size: 18pt; line-height: 50%;\">
@@ -357,7 +366,7 @@ function textbbcode($form, $text, $content = "")
 	<span id="clickableAwesomeFont"><i style="font-size: 16px;" class="fa fa-picture-o" onclick="cimage()" title="Image" alt="Image"></i></span>&nbsp;&nbsp;
 	<span id="clickableAwesomeFont"><i style="font-size: 16px;" class="fa fa-pencil" onclick="colorpicker();" title="Select Color" alt="Colors"></i></span>&nbsp;&nbsp;
 	<span id="clickableAwesomeFont"><i style="font-size: 16px;" class="fa fa-envelope-o" onclick="mail()" title="Add email" alt="Email"></i></span>&nbsp;&nbsp;
-	<span id="clickableAwesomeFont"><i style="font-size: 16px;" class="fa fa-code" onclick="tag('php')" title="Add code" alt="Code"></i></span>&nbsp;&nbsp;
+	<span id="clickableAwesomeFont"><i style="font-size: 16px;" class="fa fa-code" onclick="tag('code')" title="Add code" alt="Code"></i></span>&nbsp;&nbsp;
 	<span id="clickableAwesomeFont"><i style="font-size: 16px;" class="fa fa-quote-right" onclick="tag('quote')" title="Quote" alt="Quote"></i></span>&nbsp;&nbsp;
 HTML;
     if ($CURUSER['class'] >= UC_MODERATOR) $bbcodebody.= <<<HTML
