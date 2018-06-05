@@ -234,7 +234,8 @@ function format_comment($text, $strip_html = true, $urls = true, $images = true)
         '/\[list\]((\s|.)+?)\[\/list\]/i',
         '/\[\*\]\s?(.*?)\n/i',
         '/\[li\]\s?(.*?)\n/i',
-        '/\[hr\]/'
+        '/\[hr\]/',
+	'/\[title\]\s*((\s|.)+?)\s*\[\/title\]/i'
     );
     // And replace them by...
     $bb_code_out = array(
@@ -260,7 +261,8 @@ function format_comment($text, $strip_html = true, $urls = true, $images = true)
         '<ul class="style">\1</ul>',
         '<li>\1</li>',
         '<li>\1</li>',
-        '<hr />'
+        '<hr />',
+	'<font color="red" size="4"><b>\1</b></font>'
     );
     $s = preg_replace($bb_code_in, $bb_code_out, $s);
     if ($urls) $s = format_urls($s);
