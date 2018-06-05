@@ -295,17 +295,7 @@ if ($count) {
 
 if (isset($cleansearchstr)) $title = "{$lang['browse_search']} $searchstr";
 else $title = '';
-$HTMLOUT .= navigation_start();
-$HTMLOUT .="<a href='index.php'>" . $INSTALLER09["site_name"] . "</a>";
-$HTMLOUT .= navigation_active("Torrents");
-$HTMLOUT .= navigation_end();
 $HTMLOUT.= "<div class='row'><div class='col-md-12 col-md-offset-1'>";
-if ($CURUSER['opt1'] & user_options::VIEWSCLOUD) {
-    $HTMLOUT.= "<div id='wrapper' style='width:80%;border:1px solid black;background-color:rgba(121,124,128,0.3);'>";
-    //print out the tag cloud
-    $HTMLOUT.= cloud() . "
-    </div>";
-}
 $HTMLOUT.= "<br /><br /><div class='table-responsive'>
     <form role='form' class='form-horizontal' method='get' action='browse.php'>
     <table class='col-md-offset-1'>
