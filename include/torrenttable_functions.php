@@ -179,10 +179,11 @@ function torrenttable($res, $variant = "index")
         $nuked = ($row["nuked"] == "yes" ? "<img src='{$INSTALLER09['pic_base_url']}nuked.gif' style='border:none' alt='Nuked'  align='right' title='Reason :" . htmlsafechars($row["nukereason"]) . "' />" : "");
         $release_group = ($row['release_group'] == "scene" ? "&nbsp;<img src='{$INSTALLER09['pic_base_url']}scene.gif' title='Scene' alt='Scene' style='border:none' />" : ($row['release_group'] == "p2p" ? "&nbsp;<img src='{$INSTALLER09['pic_base_url']}p2p.gif' title='P2P' alt='P2P' />" : ""));
         $viponly = ($row["vip"] == 1 ? "<img src='{$INSTALLER09['pic_base_url']}star.png' border='0' alt='Vip Torrent' title='Vip Torrent' />" : "");
-        $freetorrent = (XBT_TRACKER == true && $row["freetorrent"] >= 1 ? "<img src='{$INSTALLER09['pic_base_url']}freedownload.gif' border='0' alt='Free Torrent' title='Free Torrent' />" : "");
+        $freetorrent = (XBT_TRACKER == true && $row["freetorrent"] >= 1 ? "<font color='red'>[Freeleech]</font>" : "");
         $bump = ($row['bump'] == "yes" ? "<img src='{$INSTALLER09['pic_base_url']}up.gif' width='12px' alt='Re-Animated torrent' title='This torrent was ReAnimated!' />" : "");
         /** FREE Torrent **/
-        $free_tag = ($row['free'] != 0 ? ' <a class="info" href="#"><b>[FREE]</b> <span>' . ($row['free'] > 1 ? 'Expires: ' . get_date($row['free'], 'DATE') . '<br />(' . mkprettytime($row['free'] - TIME_NOW) . ' to go)<br />' : 'Unlimited<br />') . '</span></a>' : $all_free_tag);
+        $free_tag = ($row['free'] != 0 ? ' <b><font color="red">[Freeleech]</font></b>' : $all_free_tag);
+//        $free_tag = ($row['free'] != 0 ? ' <a class="info" href="#"><b><font color="red">[Freeleech]</font></b> <span>' . ($row['free'] > 1 ? 'Expires: ' . get_date($row['free'], 'DATE') . '<br />(' . mkprettytime($row['free'] - TIME_NOW) . ' to go)<br />' : 'Unlimited<br />') . '</span></a>' : $all_free_tag);
         /** Silver Torrent **/
         $silver_tag = ($row['silver'] != 0 ? ' <a class="info" href="#"><b>[SILVER]</b> <span>' . ($row['silver'] > 1 ? 'Expires: ' . get_date($row['silver'], 'DATE') . '<br />(' . mkprettytime($row['silver'] - TIME_NOW) . ' to go)<br />' : 'Unlimited<br />') . '</span></a>' : '');
         if (!empty($slot)) foreach ($slot as $sl) {
