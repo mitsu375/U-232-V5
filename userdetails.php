@@ -123,6 +123,7 @@ if (($user = $mc1->get_value('user' . $id)) === false) {
         'torrents_limit',
         'peers_limit',
         'torrent_pass_version',
+	'pin_code'
     );
     $user_fields_ar_float = array(
         'time_offset',
@@ -373,14 +374,13 @@ if (($user['anonymous'] == 'yes') && ($CURUSER['class'] < UC_STAFF && $user["id"
     }
     $HTMLOUT.= "</td></tr></table><br>";
 }
-$h1_thingie = ((isset($_GET['sn']) || isset($_GET['wu'])) ? '<h1>'.$lang['userdetails_updated'].'</h1>' : '');
+$h1_thingie = ((isset($_GET['sn']) || isset($_GET['wu'])) ? '<h4>'.$lang['userdetails_updated'].'</h4>' : '');
 if ($CURUSER["id"] <> $user["id"] && $CURUSER['class'] >= UC_STAFF) $suspended.= ($user['suspended'] == 'yes' ? '&nbsp;&nbsp;<img src="' . $INSTALLER09['pic_base_url'] . 'smilies/excl.gif" alt="'.$lang['userdetails_suspended'].'" title="'.$lang['userdetails_suspended'].'">&nbsp;<b>'.$lang['userdetails_usersuspended'].'</b>&nbsp;<img src="' . $INSTALLER09['pic_base_url'] . 'smilies/excl.gif" alt="'.$lang['userdetails_suspended'].'" title="'.$lang['userdetails_suspended'].'">' : '');
 if ($CURUSER["id"] <> $user["id"] && $CURUSER['class'] >= UC_STAFF) $watched_user.= ($user['watched_user'] == 0 ? '' : '&nbsp;&nbsp;<img src="' . $INSTALLER09['pic_base_url'] . 'smilies/excl.gif" align="middle" alt="'.$lang['userdetails_watched'].'" title="'.$lang['userdetails_watched'].'"> <b>'.$lang['userdetails_watchlist1'].' <a href="staffpanel.php?tool=watched_users" >'.$lang['userdetails_watchlist2'].'</a></b> <img src="' . $INSTALLER09['pic_base_url'] . 'smilies/excl.gif" align="middle" alt="'.$lang['userdetails_watched'].'" title="'.$lang['userdetails_watched'].'">');
 $perms.= ($CURUSER['class'] >= UC_STAFF ? (($user['perms'] & bt_options::PERMS_NO_IP) ? '&nbsp;&nbsp;<img src="' . $INSTALLER09['pic_base_url'] . 'smilies/super.gif" alt="'.$lang['userdetails_invincible'].'"  title="'.$lang['userdetails_invincible'].'">' : '') : '');
 $stealth.= ($CURUSER['class'] >= UC_STAFF ? (($user['perms'] & bt_options::PERMS_STEALTH) ? '&nbsp;&nbsp;<img src="' . $INSTALLER09['pic_base_url'] . 'smilies/ninja.gif" alt="'.$lang['userdetails_stelth'].'"  title="'.$lang['userdetails_stelth'].'">' : '') : '');
 $enabled = $user["enabled"] == 'yes';
-$HTMLOUT.= "<table class='table table bordered'>" . "<tr><td><h2 style='margin:0px'>" . format_username($user, true) . "</h2>$country$perms$stealth$watched_user$suspended$h1_thingie</td></tr></table>\n";
-if ($CURUSER['id'] != $user['id']) $HTMLOUT.= "<div class='col-sm-2'><h4><a href='{$INSTALLER09['baseurl']}/sharemarks.php?id=$id'>{$lang['userdetails_sharemarks']}</a></h4></div>";
+$HTMLOUT.= "<table class='table table bordered'>" . "<tr><td><h4 style='margin:0px'>" . format_username($user, true) . "</h4>$country$perms$stealth$watched_user$suspended$h1_thingie</td></tr></table>\n";
 if ($user['opt1'] & user_options::PARKED) $HTMLOUT.= "<p><b>{$lang['userdetails_parked']}</b></p>\n";
 if (!$enabled) $HTMLOUT.= "<p><b>{$lang['userdetails_disabled']}</b></p>\n";
 elseif ($CURUSER["id"] <> $user["id"]) {
@@ -394,10 +394,12 @@ elseif ($CURUSER["id"] <> $user["id"]) {
         $blocks = mysqli_num_rows($r4);
         $mc1->cache_value('Blocks_' . $id, $blocks, $INSTALLER09['expires']['user_blocks']);
     }
+/*
     if ($friends > 0) $HTMLOUT.= "<div class='row'><div class='col-md-1'><p><a href='friends.php?action=delete&amp;type=friend&amp;targetid=$id'>{$lang['userdetails_remove_friends']}</a></p></div>\n";
     else $HTMLOUT.= "<div class='row'><div class='col-md-1'><p><a href='friends.php?action=add&amp;type=friend&amp;targetid=$id'>{$lang['userdetails_add_friends']}</a></p></div>";
     if ($blocks > 0) $HTMLOUT.= "<div class='col-md-1'><p><a href='friends.php?action=delete&amp;type=block&amp;targetid=$id'>{$lang['userdetails_remove_blocks']}</a></p></div>\n";
     else $HTMLOUT.= "<div class='row'><div class='col-md-1'><p><a href='friends.php?action=add&amp;type=block&amp;targetid=$id'>{$lang['userdetails_add_blocks']}</a></p></div>\n";
+*/
 }
 //== 09 Shitlist by Sir_Snuggles
 if ($CURUSER['class'] >= UC_STAFF) {
@@ -409,22 +411,23 @@ if ($CURUSER['class'] >= UC_STAFF) {
     }
     if ($shit_list > 0) {
         $shitty = "<img src='pic/smilies/shit.gif' alt='Shit' title='Shit'>";
-        $HTMLOUT.= "<div class='col-md-6'><b>" . $shitty . "&nbsp;{$lang['userdetails_shit1']} <a class='altlink' href='staffpanel.php?tool=shit_list&amp;action=shit_list'>{$lang['userdetails_here']}</a> {$lang['userdetails_shit2']}&nbsp;" . $shitty . "</b></div>";
+        $HTMLOUT.= "<div class='col-md-3'><b>" . $shitty . "&nbsp;{$lang['userdetails_shit1']} <a class='altlink' href='staffpanel.php?tool=shit_list&amp;action=shit_list'>{$lang['userdetails_here']}</a> {$lang['userdetails_shit2']}&nbsp;" . $shitty . "</b></div>";
     } elseif ($CURUSER["id"] <> $user["id"]) {
-        $HTMLOUT.= "<div class='col-md-6'><a class='altlink' href='staffpanel.php?tool=shit_list&amp;action=shit_list&amp;action2=new&amp;shit_list_id=" . $id . "&amp;return_to=userdetails.php?id=" . $id . "'><b>{$lang['userdetails_shit3']}</b></a></div>";
+        $HTMLOUT.= "<div class='col-md-3'><a class='altlink' href='staffpanel.php?tool=shit_list&amp;action=shit_list&amp;action2=new&amp;shit_list_id=" . $id . "&amp;return_to=userdetails.php?id=" . $id . "'><b>{$lang['userdetails_shit3']}</b></a></div>";
     }
 }
 
 $HTMLOUT .="</div>";
+/*
 if ($CURUSER['id'] == $user['id']) $HTMLOUT.= "
 <div class='container'>
 <div class='row'>
-<div class='col-sm-4'><h3><a href='{$INSTALLER09['baseurl']}/usercp.php?action=default'>[{$lang['userdetails_editself']}]</a></h3></div>
-<div class='col-sm-4 col-sm-pull-1'><h3><a href='{$INSTALLER09['baseurl']}/view_announce_history.php'>[{$lang['userdetails_announcements']}]</a></h3></div></div>";
-
+<div class='col-sm-4'><h4><a href='{$INSTALLER09['baseurl']}/usercp.php?action=default'>[{$lang['userdetails_editself']}]</a></h4></div>
+<div class='col-sm-4 col-sm-pull-1'><h4><a href='{$INSTALLER09['baseurl']}/view_announce_history.php'>[{$lang['userdetails_announcements']}]</a></h4></div></div>";
+*/
 //==invincible no iplogging and ban bypass by pdq
 $invincible = $mc1->get_value('display_' . $CURUSER['id']);
-if ($invincible) $HTMLOUT.= '<div class="col-sm-2 col-md-push-2"><h3>' . htmlsafechars($user['username']) . ' '.$lang['userdetails_is'].' ' . $invincible . ' '.$lang['userdetails_invincible'].'</h3></div>';
+if ($invincible) $HTMLOUT.= '<div class="col-sm-3 col-md-push-3"><h4>' . htmlsafechars($user['username']) . ' '.$lang['userdetails_is'].' ' . $invincible . ' '.$lang['userdetails_invincible'].'</h4></div>';
 
 //== links to make invincible method 1(PERMS_NO_IP/ no log ip) and 2(PERMS_BYPASS_BAN/cannot be banned)
 $HTMLOUT.= "<div class='container'>
@@ -472,6 +475,11 @@ if (!in_array($action, $possible_actions)) stderr('Error','<br><div class="alert
        <li><a href='userdetails.php?id={$id}&amp;action=general'>{$lang['userdetails_general']}</a></li>
        <li><a href='userdetails.php?id={$id}&amp;action=activity'>{$lang['userdetails_activity']}</a></li>
        <li><a href='userdetails.php?id={$id}&amp;action=comments'>{$lang['userdetails_usercomments']}</a></li>";
+if ($CURUSER['id'] == $user['id']) $HTMLOUT.= "<li><a href='usercp.php?action=default'>Edit Profile</a></li>
+       <li><a href='view_announce_history.php'>View Announcements</a></li>";
+if ($CURUSER['id'] != $user['id']) $HTMLOUT.= "<li><a href='{$INSTALLER09['baseurl']}/sharemarks.php?id=$id'>View Sharemarks</a></li>";
+if ($friends > 0) $HTMLOUT.= "<li><a href='friends.php?action=delete&amp;type=friend&amp;targetid=$id'>{$lang['userdetails_remove_friends']}</a></li>\n";
+else $HTMLOUT.= "<li><a href='friends.php?action=add&amp;type=friend&amp;targetid=$id'>{$lang['userdetails_add_friends']}</a></li>";
 if ($CURUSER['class'] >= UC_STAFF && $user["class"] < $CURUSER['class']) {
     $HTMLOUT.= '<li><a href="userdetails.php?id='.$id.'&amp;action=edit">'.$lang['userdetails_edit_user'].'</a></li>';
 }
@@ -502,6 +510,7 @@ if (curuser::$blocks['userdetails_page'] & block_userdetails::COMPLETED && $BLOC
 if (curuser::$blocks['userdetails_page'] & block_userdetails::CONNECTABLE_PORT && $BLOCKS['userdetails_connectable_port_on']) {
     require_once (BLOCK_DIR . 'userdetails/connectable.php');
 }
+require_once (BLOCK_DIR . 'userdetails/torrent_pass.php');
 $HTMLOUT.= "</table>";
 }
 if ($action == "snatched") {
@@ -533,7 +542,7 @@ if (($CURUSER['id'] !== $user['id']) && ($CURUSER['class'] >= UC_STAFF)) {
                             <input type="radio" value="no" name="add_to_watched_users"' . ($user['watched_user'] == 0 ? ' checked="checked"' : '') . '> '.$lang['userdetails_no1'].' <br>
                             <span id="desc_text" style="color:red;font-size: xx-small;">* '.$lang['userdetails_watch_change1'].'<br>
                             '.$lang['userdetails_watch_change2'].'</span><br>
-                            <textarea id="watched_reason" cols="50" rows="6" name="watched_reason">' . htmlsafechars($user['watched_user_reason']) . '</textarea><br>
+                           <textarea id="watched_reason" cols="50" rows="6" name="watched_reason">' . htmlsafechars($user['watched_user_reason']) . '</textarea><br>
                             <input id="watched_user_button" type="submit" value="'.$lang['userdetails_submit'].'" class="btn" name="watched_user_button">
                             </form></div> </td></tr>';
     //=== staff Notes
@@ -553,9 +562,11 @@ if (($CURUSER['id'] !== $user['id']) && ($CURUSER['class'] >= UC_STAFF)) {
     if (!empty($user_stats['modcomment'])) $HTMLOUT.= "<tr><td class='rowhead'>{$lang['userdetails_system']}</td><td align='left'>" . ($user_stats['modcomment'] != '' ? $the_flip_box_7 . '<div align="left" id="box_7" style="display:none"><hr>' . format_comment($user_stats['modcomment']) . '</div>' : '') . "</td></tr>";
 }
 //==Begin blocks
+/*
 if (curuser::$blocks['userdetails_page'] & block_userdetails::SHOWFRIENDS && $BLOCKS['userdetails_showfriends_on']){
 require_once (BLOCK_DIR . 'userdetails/showfriends.php');
 }
+*/
 if (curuser::$blocks['userdetails_page'] & block_userdetails::LOGIN_LINK && $BLOCKS['userdetails_login_link_on']) {
     require_once (BLOCK_DIR . 'userdetails/loginlink.php');
 }
@@ -568,33 +579,41 @@ if (curuser::$blocks['userdetails_page'] & block_userdetails::ONLINETIME && $BLO
 if (curuser::$blocks['userdetails_page'] & block_userdetails::BROWSER && $BLOCKS['userdetails_browser_on']) {
     require_once (BLOCK_DIR . 'userdetails/browser.php');
 }
+/*
 if (curuser::$blocks['userdetails_page'] & block_userdetails::BIRTHDAY && $BLOCKS['userdetails_birthday_on']) {
     require_once (BLOCK_DIR . 'userdetails/birthday.php');
 }
+*/
 if (curuser::$blocks['userdetails_page'] & block_userdetails::CONTACT_INFO && $BLOCKS['userdetails_contact_info_on']) {
     require_once (BLOCK_DIR . 'userdetails/contactinfo.php');
 }
 if (curuser::$blocks['userdetails_page'] & block_userdetails::IPHISTORY && $BLOCKS['userdetails_iphistory_on']) {
     require_once (BLOCK_DIR . 'userdetails/iphistory.php');
 }
+/*
 if (curuser::$blocks['userdetails_page'] & block_userdetails::AVATAR && $BLOCKS['userdetails_avatar_on']) {
     require_once (BLOCK_DIR . 'userdetails/avatar.php');
 }
+*/
 if (curuser::$blocks['userdetails_page'] & block_userdetails::USERCLASS && $BLOCKS['userdetails_userclass_on']) {
     require_once (BLOCK_DIR . 'userdetails/userclass.php');
 }
+/*
 if (curuser::$blocks['userdetails_page'] & block_userdetails::GENDER && $BLOCKS['userdetails_gender_on']) {
     require_once (BLOCK_DIR . 'userdetails/gender.php');
 }
+*/
 if (curuser::$blocks['userdetails_page'] & block_userdetails::USERINFO && $BLOCKS['userdetails_userinfo_on']) {
     require_once (BLOCK_DIR . 'userdetails/userinfo.php');
 }
 if (curuser::$blocks['userdetails_page'] & block_userdetails::REPORT_USER && $BLOCKS['userdetails_report_user_on']) {
     require_once (BLOCK_DIR . 'userdetails/report.php');
 }
+/*
 if (curuser::$blocks['userdetails_page'] & block_userdetails::USERSTATUS && $BLOCKS['userdetails_user_status_on']) {
     require_once (BLOCK_DIR . 'userdetails/userstatus.php');
 }
+*/
 if (curuser::$blocks['userdetails_page'] & block_userdetails::SHOWPM && $BLOCKS['userdetails_showpm_on']) {
     require_once (BLOCK_DIR . 'userdetails/showpm.php');
 }
@@ -613,21 +632,29 @@ $HTMLOUT.= '<tr><td class="rowhead">'.$lang['userdetails_currentmood'].'</td><td
        <img src="' . $INSTALLER09['pic_base_url'] . 'smilies/' . $moodpic . '" alt="' . $moodname . '" border="0">
        <span class="tip">' . htmlsafechars($user['username']) . ' ' . $moodname . ' !</span></a></span></td></tr>'; 
 }
+/*
 if (curuser::$blocks['userdetails_page'] & block_userdetails::SEEDBONUS && $BLOCKS['userdetails_seedbonus_on']) {
     require_once (BLOCK_DIR . 'userdetails/seedbonus.php');
 }
 if (curuser::$blocks['userdetails_page'] & block_userdetails::IRC_STATS && $BLOCKS['userdetails_irc_stats_on']) {
     require_once (BLOCK_DIR . 'userdetails/irc.php');
 }
+*/
+/*
 if (curuser::$blocks['userdetails_page'] & block_userdetails::REPUTATION && $BLOCKS['userdetails_reputation_on'] && $INSTALLER09['rep_sys_on']) {
     require_once (BLOCK_DIR . 'userdetails/reputation.php');
 }
+*/
+/*
 if (curuser::$blocks['userdetails_page'] & block_userdetails::PROFILE_HITS && $BLOCKS['userdetails_profile_hits_on']) {
     require_once (BLOCK_DIR . 'userdetails/userhits.php');
 }
+*/
+/*
 if (curuser::$blocks['userdetails_page'] & block_userdetails::FREESTUFFS && $BLOCKS['userdetails_freestuffs_on'] && XBT_TRACKER == false) {
     require_once (BLOCK_DIR . 'userdetails/freestuffs.php');
 }
+*/
 if (curuser::$blocks['userdetails_page'] & block_userdetails::COMMENTS && $BLOCKS['userdetails_comments_on']) {
     require_once (BLOCK_DIR . 'userdetails/comments.php');
 }
@@ -655,11 +682,11 @@ $HTMLOUT.= "<script type='text/javascript'>
               var pic = document.getElementById(picid);
               var form = document.getElementById(formid);
            
-              if(pic.src == bu + '/pic/plus.gif')   {
-                    pic.src = bu + '/pic/minus.gif';
+              if(pic.src == bu + '/pic/plus.png')   {
+                    pic.src = bu + '/pic/minus.png';
                     form.value = 'minus';
               }else{
-                    pic.src = bu + '/pic/plus.gif';
+                    pic.src = bu + '/pic/plus.png';
                     form.value = 'plus';
               }
        }
@@ -694,20 +721,10 @@ if ($CURUSER['class'] >= UC_STAFF && $user["class"] < $CURUSER['class']) {
     $HTMLOUT.="<br>
 	<div class='row'>
     <div class='col-sm-6'><textarea placeholder='{$lang['userdetails_signature']}' cols='60' rows='2' name='signature'>" . htmlsafechars($user['signature']) . "</textarea></div>
-    <div class='col-sm-4'>{$lang['userdetails_signature_rights']}
-    <input name='signature_post' value='yes' type='radio'".($user['signature_post'] == "yes" ? "    checked='checked'" : "").">{$lang['userdetails_yes']}
-    <input name='signature_post' value='no' type='radio'".($user['signature_post'] == "no" ? " checked='checked'" : "").">{$lang['userdetails_disable_signature']}</div></div>
-     <br>     
-        <div class='row'>
-    <div class='col-sm-4'><input class='form-control' placeholder='{$lang['userdetails_gtalk']}' type='text' name='google_talk' value='" . htmlsafechars($user['google_talk']) . "'></div>
-    <div class='col-sm-4'><input class='form-control' placeholder='{$lang['userdetails_msn']}' type='text' name='msn' value='" . htmlsafechars($user['msn']) . "'></div>
-    <div class='col-sm-4'><input class='form-control' placeholder='{$lang['userdetails_aim']}' type='text' size='60' name='aim' value='" . htmlsafechars($user['aim']) . "'></div></div>
-    <br>      
-        <div class='row'>
-    <div class='col-sm-4'><input class='form-control' placeholder='{$lang['userdetails_yahoo']}' type='text' name='yahoo' value='" . htmlsafechars($user['yahoo']) . "'></div>
-    <div class='col-sm-4'><input class='form-control' placeholder='{$lang['userdetails_icq']}' type='text' name='icq' value='" . htmlsafechars($user['icq']) . "'></div>
-    <div class='col-sm-4'><input class='form-control' placeholder='{$lang['userdetails_website']}' type='text' name='website' value='" . htmlsafechars($user['website']) . "'></div></div><br>";
-    
+    <div class='col-sm-4'>{$lang['userdetails_signature_rights']}<br>
+    &nbsp;<input name='signature_post' value='yes' type='radio'".($user['signature_post'] == "yes" ? "    checked='checked'" : "").">&nbsp;{$lang['userdetails_yes']}
+    &nbsp;<input name='signature_post' value='no' type='radio'".($user['signature_post'] == "no" ? " checked='checked'" : "").">&nbsp;{$lang['userdetails_disable_signature']}<br></div></div>
+     <br>";     
 
 //== we do not want mods to be able to change user classes or amount donated...
     // === Donor mod time based by snuggles
@@ -725,7 +742,7 @@ if ($CURUSER['class'] >= UC_STAFF && $user["class"] < $CURUSER['class']) {
         } else {
             $HTMLOUT.= "<div class='col-sm-2'>{$lang['userdetails_dfor']}<select class='form-control' name='donorlength'><option value='0'>------</option><option value='4'>1 {$lang['userdetails_month']}</option>" . "<option value='6'>6 {$lang['userdetails_weeks']}</option><option value='8'>2 {$lang['userdetails_months']}</option><option value='10'>10 {$lang['userdetails_weeks']}</option>" . "<option value='12'>3 {$lang['userdetails_months']}</option><option value='255'>{$lang['userdetails_unlimited']}</option></select></div>";
         }
-        $HTMLOUT.= "<div class='col-sm-2'><b>{$lang['userdetails_cdonation']}</b><input class='form-control' placeholder='{$lang['userdetails_cdonation']}' type='text' name='donated' value=\"" . htmlsafechars($user["donated"]) . "\">" . "<b>{$lang['userdetails_tdonations']}</b>" . htmlsafechars($user["total_donated"]) . "</div>";
+        $HTMLOUT.= "<div class='col-sm-2'><b>{$lang['userdetails_cdonation']}</b><input class='form-control' placeholder='{$lang['userdetails_cdonation']}' type='text' name='donated' value=\"" . htmlsafechars($user["donated"]) . "\">" . "<b>Total donations $</b>" . htmlsafechars($user["total_donated"]) . "</div>";
         if ($donor) {
             $HTMLOUT.= "<div class='col-sm-2'><b>{$lang['userdetails_adonor']}</b><select class='form-control' name='donorlengthadd'><option value='0'>------</option><option value='4'>1 {$lang['userdetails_month']}</option>" . "<option value='6'>6 {$lang['userdetails_weeks']}</option><option value='8'>2 {$lang['userdetails_months']}</option><option value='10'>10 {$lang['userdetails_weeks']}</option>" . "<option value='12'>3 {$lang['userdetails_months']}</option><option value='255'>{$lang['userdetails_unlimited']}</option></select></div>";
             
@@ -746,7 +763,7 @@ if ($CURUSER['class'] >= UC_STAFF && $user["class"] < $CURUSER['class']) {
  
 $HTMLOUT.= "<br><div class='row'><div class='col-sm-6'><textarea placeholder='{$lang['userdetails_supportfor']}' cols='60' rows='2' name='supportfor'>{$supportfor}</textarea></div>";
 
- $HTMLOUT.= "<div class='col-sm-1'>{$lang['userdetails_support']}</div><div class='col-sm-3'><input type='radio' name='support' value='yes'".($user["support"] == "yes" ? " checked='checked'" : "").">{$lang['userdetails_yes']}<input type='radio' name='support' value='no'".($user["support"] == "no" ? " checked='checked'" : "").">{$lang['userdetails_no']}</div></div>";
+ $HTMLOUT.= "<div class='col-sm-1'>{$lang['userdetails_support']}</div><div class='col-sm-3'><input type='radio' name='support' value='yes'".($user["support"] == "yes" ? " checked='checked'" : "").">&nbsp;{$lang['userdetails_yes']}&nbsp;<input type='radio' name='support' value='no'".($user["support"] == "no" ? " checked='checked'" : "").">&nbsp;{$lang['userdetails_no']}</div></div>";
 
 
     $modcomment = htmlsafechars($user_stats["modcomment"]);
@@ -761,7 +778,7 @@ $HTMLOUT.= "<br><div class='row'><div class='col-sm-6'><textarea placeholder='{$
     $HTMLOUT.= "<div class='col-sm-4'><p>{$lang['userdetails_bonus_comment']}</p><textarea class='shrink' placeholder='{$lang['userdetails_bonus_comment']}' cols='40' rows='6' name='bonuscomment' readonly='readonly' style='background:purple;color:yellow;'>$bonuscomment</textarea></div></div>";
     //==end
    
- $HTMLOUT.= "<br><div class='row'><div class='col-sm-1'>{$lang['userdetails_enabled']}</div><div class='col-sm-2'><input name='enabled' value='yes' type='radio'" . ($enabled ? " checked='checked'" : "") . ">{$lang['userdetails_yes']} <input name='enabled' value='no' type='radio'" . (!$enabled ? " checked='checked'" : "") . ">{$lang['userdetails_no']}</div>";
+ $HTMLOUT.= "<br><div class='row'><div class='col-sm-1'>{$lang['userdetails_enabled']}</div><div class='col-sm-2'>&nbsp;<input name='enabled' value='yes' type='radio'" . ($enabled ? " checked='checked'" : "") . ">&nbsp;{$lang['userdetails_yes']} <input name='enabled' value='no' type='radio'" . (!$enabled ? " checked='checked'" : "") . ">&nbsp;{$lang['userdetails_no']}</div>";
     
 
 
@@ -772,7 +789,7 @@ if ($CURUSER['class'] >= UC_STAFF && XBT_TRACKER == false) $HTMLOUT.= "<div clas
 if ($CURUSER['class'] >= UC_ADMINISTRATOR && XBT_TRACKER == false) {
         $free_switch = $user['free_switch'] != 0;
         $HTMLOUT.= "<div class='col-sm-1 text-right'" . (!$free_switch ? '' : '') . ">{$lang['userdetails_freeleech_status']}</div>
-                <div class='col-sm-1'>" . ($free_switch ? "<input name='free_switch' value='42' type='radio'>{$lang['userdetails_remove_freeleech']}" :'') . "</div>";
+                <div class='col-sm-1'>" . ($free_switch ? "&nbsp;<input name='free_switch' value='42' type='radio'>{$lang['userdetails_remove_freeleech']}" :'') . "</div>";
         if ($free_switch) {
             if ($user['free_switch'] == 1) $HTMLOUT.= '<div class="col-sm-2">('.$lang['userdetails_unlimited_d'].')</div>';
             else $HTMLOUT.= "<div class='col-sm-2'>{$lang['userdetails_until']} " . get_date($user['free_switch'], 'DATE') . " (" . mkprettytime($user['free_switch'] - TIME_NOW) . " {$lang['userdetails_togo']})</div>";
@@ -800,7 +817,7 @@ if ($CURUSER['class'] >= UC_ADMINISTRATOR && XBT_TRACKER == false) {
     if ($CURUSER['class'] >= UC_STAFF && XBT_TRACKER == false) {
         $downloadpos = $user['downloadpos'] != 1;
         $HTMLOUT.= "<br><div class='row'><div class='col-sm-2'" . (!$downloadpos ? ' rowspan="2"' : '') . ">{$lang['userdetails_dpos']}</div>
-               <div class='col-sm-2'>" . ($downloadpos ? "<input name='downloadpos' value='42' type='radio'>{$lang['userdetails_remove_download_d']}" : $lang['userdetails_no_disablement']) . "</div>";
+               <div class='col-sm-2'>" . ($downloadpos ? "&nbsp;<input name='downloadpos' value='42' type='radio'>&nbsp;{$lang['userdetails_remove_download_d']}&nbsp;" : $lang['userdetails_no_disablement']) . "</div>";
         if ($downloadpos) {
             if ($user['downloadpos'] == 0) $HTMLOUT.= '<div class="col-sm-1">('.$lang['userdetails_unlimited_d'].')</div>';
             else $HTMLOUT.= "<div class='col-sm-2'>{$lang['userdetails_until']} " . get_date($user['downloadpos'], 'DATE') . " (" . mkprettytime($user['downloadpos'] - TIME_NOW) . " {$lang['userdetails_togo']})</div><div class='col-sm-6'><!--<input class='form-control' placeholder='Comments' type='text' name='disable_pm'></div></div>";
@@ -1002,7 +1019,7 @@ $HTMLOUT.="<div style='display:inline-block;height:100px;'></div>";
 //Adjust up/down
     if ($CURUSER['class'] >= UC_ADMINISTRATOR) {
         $HTMLOUT.= "<div class='row'>
-<div class='col-sm-1'>{$lang['userdetails_addupload']}<img src='{$INSTALLER09['pic_base_url']}plus.gif' alt='{$lang['userdetails_change_ratio']}' title='{$lang['userdetails_change_ratio']}!' id='uppic' onclick=\"togglepic('{$INSTALLER09['baseurl']}', 'uppic','upchange')\"></div>
+<div class='col-sm-1'>{$lang['userdetails_addupload']}&nbsp;<img src='{$INSTALLER09['pic_base_url']}plus.png' alt='{$lang['userdetails_change_ratio']}' title='{$lang['userdetails_change_ratio']}!' id='uppic' onclick=\"togglepic('{$INSTALLER09['baseurl']}', 'uppic','upchange')\"></div>
 <div class='col-sm-2'><input class='form-control' type='text' name='amountup'></div>
         
          <div class='col-sm-2'><select class='form-control'  name='formatup'>
@@ -1011,7 +1028,7 @@ $HTMLOUT.="<div style='display:inline-block;height:100px;'></div>";
 <div class='col-sm-1'>
 <input class='form-control' type='hidden' id='upchange' name='upchange' value='plus'></div>
          
-<div class='col-sm-1'>{$lang['userdetails_adddownload']}<img src='{$INSTALLER09['pic_base_url']}plus.gif' alt='{$lang['userdetails_change_ratio']}' title='{$lang['userdetails_change_ratio']}!' id='downpic' onclick=\"togglepic('{$INSTALLER09['baseurl']}','downpic','downchange')\"></div>
+<div class='col-sm-1'>{$lang['userdetails_adddownload']}&nbsp;<img src='{$INSTALLER09['pic_base_url']}plus.png' alt='{$lang['userdetails_change_ratio']}' title='{$lang['userdetails_change_ratio']}!' id='downpic' onclick=\"togglepic('{$INSTALLER09['baseurl']}','downpic','downchange')\"></div>
 <div class='col-sm-2'><input class='form-control' type='text' name='amountdown'></div>
          
          <div class='col-sm-2'><select class='form-control' name='formatdown'>
@@ -1049,7 +1066,7 @@ if (XBT_TRACKER == true) {
 $HTMLOUT.="<div style='display:inline-block;height:50px;'></div>";
 
 //==Invites
-    $HTMLOUT.= "<div class='col-sm-1'>{$lang['userdetails_invright']}<input type='radio' name='invite_on' value='yes'".($user["invite_on"] == "yes" ? " checked='checked'" : "").">{$lang['userdetails_yes']}<input type='radio' name='invite_on' value='no'".($user["invite_on"] == "no" ? " checked='checked'" : "").">{$lang['userdetails_no']}</div>";
+    $HTMLOUT.= "<div class='col-sm-1'>{$lang['userdetails_invright']}<input type='radio' name='invite_on' value='yes'".($user["invite_on"] == "yes" ? " checked='checked'" : "").">{$lang['userdetails_yes']}&nbsp;<input type='radio' name='invite_on' value='no'".($user["invite_on"] == "no" ? " checked='checked'" : "").">{$lang['userdetails_no']}</div>";
    $HTMLOUT.= "<div class='col-sm-1'><b>{$lang['userdetails_invites']}</b><input class='form-control' type='text'name='invites' value='" . htmlsafechars($user['invites']) . "'></div><!--</div>-->";
 //==end invites
     
