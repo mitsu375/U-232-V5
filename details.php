@@ -508,50 +508,6 @@ if (empty($torrents["poster"]) or ($torrents["poster"] == "./pic/noposter.jpg") 
 
     if (empty($tvmaze_info) && (empty($torrents['url']) || empty($omdb['Title']))) $HTMLOUT .= "<tr><td colspan='2'>No Imdb or TVMaze info</td></tr>";*/
 
-
-
-function youtube()
-{
-global $imdb, $youtube_url, $poster, $imdba;
-if ($imdba == "yes") {
-preg_match('{\b(tt[0-9]{0,8})\b}', $imdb, $text);
-$omdbraw = file_get_contents("http://omdbapi.com/?apikey=*******&i=" . $text[0]);
-$omdb = json_decode($omdbraw, true);
-$moviename = $omdb['Title'] . " " . $omdb['Year'];
-require_once '/google-api-php-client/src/Google/autoload.php';
-$search = $moviename . ' official trailer';
-$DEVELOPER_KEY = 'AIzaSyDnV3IHUuTfzu6xB5HhrpTkK4AlGD43D8k';
-$client = new Google_Client();
-$client->setDeveloperKey($DEVELOPER_KEY);
-$youtube = new Google_Service_YouTube($client);
-try {
-$searchResponse = $youtube->search->listSearch('id,snippet', array('type' => 'video', 'q' => $search, 'maxResults' => 1, 'regionCode' => 'US', 'videoEmbeddable' => 'true'));
-foreach ($searchResponse['items'] as $searchResult) {
-$yid = $searchResult['id']['videoId'];
-}
-} catch (Google_Service_Exception $e) {
-} catch (Google_Exception $e) {
-}
-$youtube_url = (isset($yid) ? 'https://www.youtube.com/watch?v=' . $yid : '');
-$posters = unserialize(file_get_contents('posters.array'));
-if (!array_key_exists($text[0], $posters)) {
-if ($omdb['Poster'] != "N/A") {
-$poster = uploadposter($text[0], $omdb['Poster']);
-$posters[$text[0]] = $poster;
-file_put_contents('posters.array', serialize($posters));
-} else {
-$poster = '';
-}
-} else {
-$poster = $posters[$text[0]];
-}
-} else {
-$poster = $youtube_url = '';
-}
-}
-
-
-
     $omdbapi_key = '*******'; //Change me to your omdbapi key get @ https://www.omdbapi.com/apikey.aspx
     if ((in_array($torrents['category'], $INSTALLER09['movie_cats']))) {
         $imdb_id_new = 0;
@@ -566,12 +522,12 @@ $poster = $youtube_url = '';
         if ($torrents['url'] != '') {
             //==auto imdb rewritten putyn 28/06/2011
             $imdb          = '';
-            $omdb['Title'] = $omdb['Orig_title'] = $omdb['Year'] = $omdb['Actors'] = $omdb['Rating'] = $omdb['Votes'] = $omdb['Gen'] = $omdb['Runtime'] = $omdb['Country'] = $omdb['Lanuage'] = $omdb['Director'] = $omdb['Producer'] = $omdb['Writer'] = $omdb['Compose'] = $omdb['Plotoutline'] = $omdb['Plot'] = $omdb['Trailers'] = $omdb['Comment'] = "";
+            $omdb['Title'] = $omdb['Orig_title'] = $omdb['Year'] = $omdb['Actors'] = $omdb['Rating'] = $omdb['Votes'] = $omdb['Gen'] = $omdb['Runtime'] = $omdb['Country'] = $omdb['Lanuage'] = $omdb['Director'] = $omdb['Producer'] = $omdb['Writer'] = $omdb['Compose'] = $omdb['Plotoutline'] = $omdb['Plot'] = $omdb['Trailers'] = $omdb['Comment'] = $omdb['imdbRating'] = $omdb['imdbVotes'] = "";
             //            $imdb_info = get_imdb($torrents['url']);
 
             $imdb_id = $imdb_id_new;
 
-            $url  = file_get_contents("https://www.omdbapi.com/?i=tt" . $imdb_id . "&plot=full&r=json&apikey=" . $omdbapi_key);
+            $url  = file_get_contents("https://www.omdbapi.com/?i=tt" . $imdb_id . "&plot=short&r=json&apikey=" . $omdbapi_key);
             $omdb = json_decode($url, true);
 
             $poster = $omdb['Poster'];
@@ -601,6 +557,8 @@ $poster = $youtube_url = '';
 	<strong><span style='color:#79c5c5;'>Cast:</span></strong><font color='orange'> " . $omdb['Actors'] . "</font><br/><br/>
 	<strong><span style='color:#79c5c5;'>Description:</spn></strong><font color='orange'> " . $omdb['Plot'] . "</font><br/><br/>
 	<strong><span style='color:#79c5c5;'>Runtime:</span></strong><font color='orange'> " . $omdb['Runtime'] . "</font><br/><br/>
+	<strong><span style='color:#79c5c5;'>Rating:</span></strong><font color='orange'> " . $omdb['imdbRating'] . "/10</font><br/><br/>
+	<strong><span style='color:#79c5c5;'>Votes:</span></strong><font color='orange'> " . $omdb['imdbVotes'] . "</font><br/><br/>
 	<strong><span style='color:#79c5c5;'>URL:</span></strong><font color='orange'><a href='" . $torrents['url'] . "'> " . $torrents['url'] . "</a></font></td></tr>";
 	          if (empty($torrents["poster"]) or ($torrents["poster"] == "./pic/noposter.jpg") && $omdb['Poster'] != "./pic/noposter.jpg") {
                     sql_query("UPDATE torrents SET poster = " . sqlesc($omdb['Poster']) . " WHERE id = $id LIMIT 1") or sqlerr(__file__, __line__);
