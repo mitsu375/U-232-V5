@@ -39,8 +39,8 @@ $a = mysqli_fetch_assoc($r) or die("{$lang['text_puke']}");
 $HTMLOUT = '';
 $HTMLOUT .= "
 <div class='row'>
-<div  class='col-md-12 text-center'><h2>{$lang['text_nfofor']}<a href='{$INSTALLER09['baseurl']}/details.php?id=$id'>".htmlsafechars($a['name'])."</a></h2></div>
-<div  class='col-md-12 text-center'><h2>{$lang['text_forbest']}<a href='ftp://{$_SERVER['HTTP_HOST']}/misc/linedraw.ttf'>{$lang['text_linedraw']}</a>{$lang['text_font']}</h2></div>
+<div  class='col-md-12 text-center'><h4>{$lang['text_nfofor']}<a href='{$INSTALLER09['baseurl']}/details.php?id=$id'>".htmlsafechars($a['name'])."</a></h4></div>
+<div  class='col-md-12 text-center'><h4>{$lang['text_forbest']}<a href='ftp://{$_SERVER['HTTP_HOST']}/misc/linedraw.ttf'>{$lang['text_linedraw']}</a>{$lang['text_font']}</h4></div>
 <div class='row'><div class='col-md-12'>
 <table class='table table-bordered'>
 <tr>
@@ -54,4 +54,3 @@ $HTMLOUT .= " </div>
 // , true, $stdhead
 echo stdhead($lang['text_stdhead']) . $HTMLOUT . stdfoot(); 
 ?>
-
