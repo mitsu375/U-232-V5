@@ -99,11 +99,14 @@ $wantpasshash = make_passhash($secret, md5($wantpassword));
 $editsecret = (!$arr[0] ? "" : EMAIL_CONFIRM ? make_passhash_login_key() : "");
 $wanthintanswer = md5($hintanswer);
 $user_frees = (XBT_TRACKER == true ? 0 : TIME_NOW + 14 * 86400);
+$uploaded = '53687091200'; //Change this amount in bytes
+$seedbonus = '400'; //Change this amount
+$torrent_pass = md5($wantusername); //Torrent passkey assigned at signup
 check_banned_emails($email);
 $psecret = $editsecret;
 //$emails = encrypt_email($email);
 
-$ret = sql_query("INSERT INTO users (username, passhash, secret, editsecret, birthday, country, gender, pin_code, stylesheet, passhint, hintanswer, email, status, " . (!$arr[0] ? "class, " : "") . "added, last_access, time_offset, dst_in_use, free_switch) VALUES (" . implode(",", array_map("sqlesc", array(
+$ret = sql_query("INSERT INTO users (username, passhash, secret, editsecret, birthday, country, gender, pin_code, stylesheet, passhint, hintanswer, email, status, uploaded, seedbonus, torrent_pass, " . (!$arr[0] ? "class, " : "") . "added, last_access, time_offset, dst_in_use, free_switch) VALUES (" . implode(",", array_map("sqlesc", array(
     $wantusername,
     $wantpasshash,
     $secret,
@@ -116,7 +119,10 @@ $ret = sql_query("INSERT INTO users (username, passhash, secret, editsecret, bir
     $passhint,
     $wanthintanswer,
     $email,
-    (!$arr[0] || !EMAIL_CONFIRM ? 'confirmed' : 'pending')
+    (!$arr[0] || !EMAIL_CONFIRM ? 'confirmed' : 'pending'),
+    $uploaded,
+    $seedbonus,
+    $torrent_pass
 ))) . ", " . (!$arr[0] ? UC_SYSOP . ", " : "") . "" . TIME_NOW . "," . TIME_NOW . " , $time_offset, {$dst_in_use['tm_isdst']}, $user_frees)") or sqlerr(__FILE__, __LINE__);
 
 $mc1->delete_value('birthdayusers');

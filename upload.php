@@ -58,7 +58,7 @@ if ($res_request) {
 } else {
     $request.= '<option class="body" value="0">'.$lang['upload_add_noreq'].'</option>';
 }
-$request.= '</select>'.$lang['upload_add_fill'].'</div> ';
+$request.= '</select><font class="small">'.$lang['upload_add_fill'].'</font></div> ';
 //=== offers list if member has made any offers
 $res_offer = sql_query('SELECT id, offer_name FROM offers WHERE offered_by_user_id = ' . sqlesc($CURUSER['id']) . ' AND status = \'approved\' ORDER BY offer_name ASC');
 if (mysqli_num_rows($res_offer) > 0) {
@@ -108,21 +108,13 @@ $HTMLOUT.= "<div class='row'>
 <input class='form-control' placeholder='{$lang['upload_name']}' type='text' id='name' name='name'>({$lang['upload_filename']})</div>
 </div><br />
 <div class='row'>
-<div class='col-sm-12'>    
-<input class='form-control' placeholder='{$lang['upload_tags']}' type='text' name='tags'>({$lang['upload_tag_info']})</div>  
-</div><br />
-<div class='row'>
-<div class='col-sm-12'> 
-<input class='form-control' placeholder='{$lang['upload_small_description']}' type='text' name='description'>({$lang['upload_small_descr']})</div>
-</div><br />
-<div class='row'>
 <div class='col-sm-12'> 
 {$lang['upload_nfo']}<input class='btn btn-default btn-adjust' type='file' name='nfo'>({$lang['upload_nfo_info']})</div>
 </div><br />
 <div class='row'>
 <div class='col-sm-8'> 
 <p style='white-space: nowrap;'>{$lang['upload_description']}</p><p>". textbbcode("upload","descr")."<br />({$lang['upload_html_bbcode']})</p></div></div>";
-$s = "<div class='row'><div class='col-sm-4'>{$lang['upload_type']}<select class='form-control' name='type'>\n<option value='0'>({$lang['upload_choose_one']})</option>\n";       
+$s = "<div class='row'><div class='col-sm-4'>{$lang['upload_type']}<select class='form-control' name='type'>\n<option value='0'>({$lang['upload_choose_one']})</option>\n";
 $cats = genrelist();
 foreach ($cats as $row) {
     $s.= "<option value='" . (int)$row["id"] . "'>" . htmlsafechars($row["name"]) . "</option>\n";
@@ -131,10 +123,10 @@ $s.= "</select></div>";
 $rg = "<div class='col-sm-4'>{$lang['upload_add_typ']}<select class='form-control' name='release_group'>\n<option value='none'>{$lang['upload_add_typnone']}</option>\n<option value='p2p'>{$lang['upload_add_typp2p']}</option>\n<option value='scene'>{$lang['upload_add_typscene']}</option>\n</select></div></div><br />";
 $HTMLOUT.= "$s";
 $HTMLOUT.=$request;
-$HTMLOUT.=$rg;
+//$HTMLOUT.=$rg;
 $HTMLOUT.= $offers;
-if ($CURUSER['class'] >= UC_UPLOADER AND XBT_TRACKER == false) {
-    $HTMLOUT.= "<br /><div class='row'>
+if ($CURUSER['class'] >= UC_STAFF AND XBT_TRACKER == false) {
+    $HTMLOUT.= "<div class='row'>
 <div class='col-sm-4'>{$lang['upload_add_free']}  
     <select class='form-control' name='free_length'>
     <option value='0'>{$lang['upload_add_nofree']}</option>
@@ -165,13 +157,10 @@ foreach ($subs as $s) {
     ++$i;
 }
 $subs_list.= "";
-$HTMLOUT.= "<div class='row'><div class='col-sm-5'>{$lang['upload_add_sub']}<br />$subs_list</div>";
+//$HTMLOUT.= "<div class='row'><div class='col-sm-5'>{$lang['upload_add_sub']}<br />$subs_list</div>";
 //== 09 Genre mod no mysql by Traffic
 $HTMLOUT.= "<div class='col-sm-5'>{$lang['upload_add_genre']}<p>
     <input type='radio' name='genre' value='movie'>{$lang['upload_add_movie']}
-    <input type='radio' name='genre' value='music'>{$lang['upload_add_music']}
-    <input type='radio' name='genre' value='game'>{$lang['upload_add_game']}
-    <input type='radio' name='genre' value='apps'>{$lang['upload_add_apps']}
     <input type='radio' name='genre' value='' checked='checked'>{$lang['upload_add_none']}
    </p>
     
@@ -186,9 +175,51 @@ $movie = array(
     $lang['movie_mv5'],
     $lang['movie_mv6'],
     $lang['movie_mv7'],
+    $lang['movie_mv8'],
+    $lang['movie_mv9'],
+    $lang['movie_mv10'],
+    $lang['movie_mv11'],
+    $lang['movie_mv12'],
+    $lang['movie_mv13'],
+    $lang['movie_mv14'],
+    $lang['movie_mv15'],
+    $lang['movie_mv16'],
+    $lang['movie_mv17'],
+    $lang['movie_mv18'],
+    $lang['movie_mv19'],
+    $lang['movie_mv20'],
+    $lang['movie_mv21']
 );
 for ($x = 0; $x < count($movie); $x++) {
     $HTMLOUT.= "<label><input type=\"checkbox\" value=\"$movie[$x]\"  name=\"movie[]\" class=\"DEPENDS ON genre BEING movie\" />$movie[$x]</label>";
+}
+$tv = array(
+    $lang['tv_tv1'],
+    $lang['tv_tv2'],
+    $lang['tv_tv3'],
+    $lang['tv_tv4'],
+    $lang['tv_tv5'],
+    $lang['tv_tv6'],
+    $lang['tv_tv7'],
+    $lang['tv_tv8'],
+    $lang['tv_tv9'],
+    $lang['tv_tv10'],
+    $lang['tv_tv11'],
+    $lang['tv_tv12'],
+    $lang['tv_tv13'],
+    $lang['tv_tv14'],
+    $lang['tv_tv15'],
+    $lang['tv_tv16'],
+    $lang['tv_tv17'],
+    $lang['tv_tv18'],
+    $lang['tv_tv19'],
+    $lang['tv_tv20'],
+    $lang['tv_tv21'],
+    $lang['tv_tv22'],
+    $lang['tv_tv23']
+);
+for ($x = 0; $x < count($tv); $x++) {
+    $HTMLOUT.= "<label><input type=\"checkbox\" value=\"$tv[$x]\" name=\"tv[]\" class=\"DEPENDS ON genre BEING tv\">$tv[$x]</label>";
 }
 $music = array(
     $lang['music_m1'],
@@ -197,47 +228,33 @@ $music = array(
     $lang['music_m4'],
     $lang['music_m5'],
     $lang['music_m6'],
+    $lang['music_m7'],
+    $lang['music_m8'],
+    $lang['music_m9'],
+    $lang['music_m10'],
+    $lang['music_m11'],
+    $lang['music_m12'],
+    $lang['music_m13']
 );
 for ($x = 0; $x < count($music); $x++) {
-    $HTMLOUT.= "<label><input type=\"checkbox\" value=\"$music[$x]\" name=\"music[]\" class=\"DEPENDS ON genre BEING music\" />$music[$x]</label>";
+    $HTMLOUT.= "<label><input type=\"checkbox\" value=\"$music[$x]\" name=\"music[]\" class=\"DEPENDS ON genre BEING music\">$music[$x]</label>";
 }
-$game = array(
-    $lang['game_g1'],
-    $lang['game_g2'],
-    $lang['game_g3'],
-    $lang['game_g4'],
-    $lang['game_g5'],
-);
-for ($x = 0; $x < count($game); $x++) {
-    $HTMLOUT.= "<label><input type=\"checkbox\" value=\"$game[$x]\" name=\"game[]\" class=\"DEPENDS ON genre BEING game\" />$game[$x]</label>";
-}
-$apps = array(
-    $lang['app_mv1'],
-    $lang['app_mv2'],
-    $lang['app_mv3'],
-    $lang['app_mv4'],
-    $lang['app_mv5'],
-    $lang['app_mv6'],
-    $lang['app_mv7'],
-);
-for ($x = 0; $x < count($apps); $x++) {
-    $HTMLOUT.= "<label><input type=\"checkbox\" value=\"$apps[$x]\" name=\"apps[]\" class=\"DEPENDS ON genre BEING apps\" />$apps[$x]</label>";
-}
+
 $HTMLOUT.= "</p></p></div></div>";
 //== End
-$HTMLOUT.="<br /><div class='row'>";
-$HTMLOUT.= "<div class='col-sm-3'>{$lang['upload_anonymous']}<br /><input type='checkbox' name='uplver' value='yes' id='chk1'><br />{$lang['upload_anonymous1']}</div>";
-if ($CURUSER['class'] == UC_MAX) {
-    $HTMLOUT.= "<div class='col-sm-3'>{$lang['upload_comment']}<br /><input type='checkbox' name='allow_commentd' value='yes' id='chk2'><br />{$lang['upload_discom1']}</div>";
+$HTMLOUT.="<br /><div class='row'></div><br />";
+$HTMLOUT.= "<div class='col-sm-3'>{$lang['upload_anonymous']}&nbsp;<input type='checkbox' name='uplver' value='yes' id='chk1'><br /><font class='small'>{$lang['upload_anonymous1']}</font></div>";
+if ($CURUSER['class'] >= UC_STAFF) {
+    $HTMLOUT.= "<div class='col-sm-3'>{$lang['upload_comment']}&nbsp;<input type='checkbox' name='allow_commentd' value='yes' id='chk2'><br /><font class='small'>{$lang['upload_discom1']}</font></div>";
 }
-$HTMLOUT.= "<div class='col-sm-3'>{$lang['upload_add_ascii']}<br /><input type='checkbox' name='strip' value='strip' checked='checked' id='chk3'><br /><a href='http://en.wikipedia.org/wiki/ASCII_art' target='_blank'>{$lang['upload_add_wascii']}</a></div>";
+$HTMLOUT.= "<div class='col-sm-3'>{$lang['upload_add_ascii']}&nbsp;<input type='checkbox' name='strip' value='strip' checked='checked' id='chk3'><br /><a href='http://en.wikipedia.org/wiki/ASCII_art' target='_blank'><font class='small'>{$lang['upload_add_wascii']}</font></a></div>";
 
 if (XBT_TRACKER == true) {
-        $HTMLOUT.= "<div class='col-sm-3'>{$lang['upload_add_free']}<br /><input type='checkbox' name='freetorrent' value='1'><br />{$lang['upload_add_freeinf']}</div>";
+        $HTMLOUT.= "<div class='col-sm-3'>{$lang['upload_add_free']}&nbsp;<input type='checkbox' name='freetorrent' value='1'><br /><font class='small'>{$lang['upload_add_freeinf']}</font></div>";
     }
 $HTMLOUT.="</div>";
 $HTMLOUT.= "<div style='display:inline-block;height:50%;'></div><div class='row'><div class='col-sm-12 col-sm-offset-5'><input type='submit' class='btn btn-default' value='{$lang['upload_submit']}'></div></div>
-     </br></form></div><br />";
+     </br></form><br />";
 ////////////////////////// HTML OUTPUT //////////////////////////
 echo stdhead($lang['upload_stdhead'], true, $stdhead) . $HTMLOUT . stdfoot($stdfoot);
 ?>

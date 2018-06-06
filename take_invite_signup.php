@@ -96,10 +96,13 @@ $secret = mksecret();
 $wantpasshash = make_passhash($secret, md5($wantpassword));
 $editsecret = (!$arr[0] ? "" : make_passhash_login_key());
 $wanthintanswer = md5($hintanswer);
+$uploaded = '53687091200'; //Change amount in bytes
+$seedbonus = '400'; //Change this amount
+$torrent_pass = md5($wantusername); //torrent passkey assigned at signup
 check_banned_emails($email);
-$user_frees = (TIME_NOW + 14 * 86400);
+//$user_frees = (TIME_NOW + 14 * 86400);
 //$emails = encrypt_email($email);
-$new_user = sql_query("INSERT INTO users (username, passhash, secret, passhint, hintanswer, editsecret, birthday, country, gender, stylesheet, invitedby, email, added, last_access, last_login, time_offset, dst_in_use, free_switch, pin_code) VALUES (" . implode(",", array_map("sqlesc", array(
+$new_user = sql_query("INSERT INTO users (username, passhash, secret, passhint, hintanswer, editsecret, birthday, country, gender, stylesheet, invitedby, email, added, last_access, last_login, time_offset, dst_in_use, free_switch, pin_code, uploaded, seedbonus, torrent_pass, status) VALUES (" . implode(",", array_map("sqlesc", array(
     $wantusername,
     $wantpasshash,
     $secret,
@@ -118,7 +121,11 @@ $new_user = sql_query("INSERT INTO users (username, passhash, secret, passhint, 
     $time_offset,
     $dst_in_use['tm_isdst'],
     $user_frees,
-    $pincode
+    $pincode,
+    $uploaded,
+    $seedbonus,
+    $torrent_pass,
+    confirmed
 ))) . ")") or sqlerr(__FILE__, __LINE__);
 $id = ((is_null($___mysqli_res = mysqli_insert_id($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res);
 sql_query("INSERT INTO usersachiev (id, username) VALUES (" . sqlesc($id) . ", " . sqlesc($wantusername) . ")") or sqlerr(__FILE__, __LINE__);
@@ -127,6 +134,7 @@ $message = "Welcome New {$INSTALLER09['site_name']} Member : - " . htmlsafechars
 if (!$new_user) {
     if (((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_errno($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_errno()) ? $___mysqli_res : false)) == 1062) stderr("Error", "Username already exists!");
 }
+/*
 //===send PM to inviter
 $sender = (int)$assoc["sender"];
 $added = TIME_NOW;
@@ -137,6 +145,7 @@ $mc1->delete_value('inbox_new_' . $sender);
 $mc1->delete_value('inbox_new_sb_' . $sender);
 //////////////end/////////////////////
 sql_query('UPDATE invite_codes SET receiver = ' . sqlesc($id) . ', status = "Confirmed" WHERE sender = ' . sqlesc((int)$assoc['sender']) . ' AND code = ' . sqlesc($invite)) or sqlerr(__FILE__, __LINE__);
+*/
 $latestuser_cache['id'] = (int)$id;
 $latestuser_cache['username'] = $wantusername;
 $latestuser_cache['class'] = '0';
@@ -156,5 +165,5 @@ write_log('User account ' . htmlsafechars($wantusername) . ' was created!');
 if ($INSTALLER09['autoshout_on'] == 1) {
     autoshout($message);
 }
-stderr('Success', 'Signup successfull, Your inviter needs to confirm your account now before you can use your account !');
+stderr('Success', 'Signup successful! You may now log in to your new account! Make sure you read the rules and FAQ before using the tracker!');
 ?>
