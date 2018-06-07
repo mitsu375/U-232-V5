@@ -46,8 +46,7 @@ if (isset($_GET['clear_new']) && $_GET['clear_new'] == 1) {
 $stdfoot = array(
     /** include js **/
     'js' => array(
-        'java_klappe',
-        'wz_tooltip'
+        'java_klappe'
     )
 );
 $stdhead = array(
@@ -73,7 +72,7 @@ $(document).ready(function(){
 </script>';
 $search_help_boolean = '<div class="panel panel-default">
 	<div class="panel-heading">
-<h2 class="text-center text-info">The boolean search supports the following operators:</h2>
+<h4 class="text-center text-info">The boolean search supports the following operators:</h4>
 </div><div class="panel">
 	<div class="panel-body">
  <p><span style="font-weight: bold;">+</span> A leading plus sign indicates that this word must be present.<br /><br />
@@ -270,7 +269,7 @@ if (($count = $mc1->get_value($where_key)) === false) {
     $mc1->cache_value($where_key, $count, $INSTALLER09['expires']['browse_where']);
 }
 $torrentsperpage = $CURUSER["torrentsperpage"];
-if (!$torrentsperpage) $torrentsperpage = 15;
+if (!$torrentsperpage) $torrentsperpage = 50;
 if ($count) {
     if ($addparam != "") {
         if ($pagerlink != "") {
@@ -295,7 +294,21 @@ if ($count) {
 
 if (isset($cleansearchstr)) $title = "{$lang['browse_search']} $searchstr";
 else $title = '';
+/*
+$HTMLOUT .= navigation_start();
+$HTMLOUT .="<a href='index.php'>" . $INSTALLER09["site_name"] . "</a>";
+$HTMLOUT .= navigation_active("Torrents");
+$HTMLOUT .= navigation_end();
+*/
 $HTMLOUT.= "<div class='row'><div class='col-md-12 col-md-offset-1'>";
+/*
+if ($CURUSER['opt1'] & user_options::VIEWSCLOUD) {
+    $HTMLOUT.= "<div id='wrapper' style='width:80%;border:1px solid black;background-color:rgba(121,124,128,0.3);'>";
+    //print out the tag cloud
+    $HTMLOUT.= cloud() . "
+    </div>";
+}
+*/
 $HTMLOUT.= "<br /><br /><div class='table-responsive'>
     <form role='form' class='form-horizontal' method='get' action='browse.php'>
     <table class='col-md-offset-1'>
@@ -307,8 +320,8 @@ $i = 0;
     foreach ($cats as $cat) {
         if($cat['min_class'] <= $CURUSER['class']){
             $HTMLOUT.= ($i && $i % $INSTALLER09['catsperrow'] == 0) ? "</tr><tr>" : "";
-            $HTMLOUT.= "<td style=\"padding-bottom: 2px;padding-left: 7px\">
-             <input name='c" . (int)$cat['id'] . "' class=\"styled\" type=\"checkbox\" " . (in_array($cat['id'], $wherecatina) ? "checked='checked' " : "") . "value='1' /><a class='catlink' href='browse.php?cat=" . (int)$cat['id'] . "'> " . (($CURUSER['opt2'] & user_options_2::BROWSE_ICONS) ? "<img src='{$INSTALLER09['pic_base_url']}caticons/{$CURUSER['categorie_icon']}/" . htmlsafechars($cat['image']) . "' alt='" . htmlsafechars($cat['name']) . "' title='" . htmlsafechars($cat['name']) . "' />" : "" . htmlsafechars($cat['name']) . "") . "</a></td>\n";
+            $HTMLOUT.= "<td style=\"padding-bottom: 4px;padding-left: 6px\">
+	     <input name='c" . (int)$cat['id'] . "' class=\"styled\" type=\"checkbox\" " . (in_array($cat['id'], $wherecatina) ? "checked='checked' " : "") . "value='1' /><a class='catlink' href='browse.php?cat=" . (int)$cat['id'] . "'> " . htmlsafechars($cat['name']) . "</a></td>\n";
             $i++;
         }
     }
@@ -338,7 +351,7 @@ $HTMLOUT.= "</tr>
     </table><br /></div>";
 //== clear new tag manually
 if ($CURUSER['opt1'] & user_options::CLEAR_NEW_TAG_MANUALLY) {
-    $new_button = "<a href='?clear_new=1'><input type='submit' value='clear new tag' class='button' /></a><br>";
+    $new_button = "<a href='?clear_new=1'><input type='submit' value='clear new tag' class='button' /></a><br><br>";
 } else {
     //== clear new tag automatically
     sql_query("UPDATE users SET last_browse=" . TIME_NOW . " where id=" . $CURUSER['id']);
@@ -397,13 +410,13 @@ foreach (array(
 $searchin.= '</select>';
 $HTMLOUT.="<div class='col-md-3'>$searchin</div>" . "<div class='col-md-3'>$deadcheck</div>" . "<br />". $only_free_box ."</div>";
 $HTMLOUT.= "</div><br /><div class='row'>
-<div class='col-md-4'><a href='{$INSTALLER09["baseurl"]}/browse_catalogue.php' class='btn btn-default btn-default'>Alternative Browse</a></div>
+<div class='col-md-4'></div>
 <div class='col-md-4'><input class='form-control btn btn-md btn-primary' type='submit' value='{$lang['search_search_btn']}'></div>
-<div class='col-md-4 col-md-push-2'><a href='{$INSTALLER09["baseurl"]}/catalogue.php' class='btn btn-default btn-default'>Search our Catalogue</a></div></div>
+<div class='col-md-4 col-md-push-2'></div></div>
            </form><br /><div class='res'></div>";
 $HTMLOUT.= "{$new_button}";
 if (isset($cleansearchstr)) {
-    $HTMLOUT.= "<div class='row'><div class='col-md-6 col-md-offset-4'><h2>{$lang['browse_search']} " . htmlsafechars($searchstr, ENT_QUOTES) . "</h2></div></div>\n";
+    $HTMLOUT.= "<div class='row'><div class='col-md-6 col-md-offset-4'><h4>{$lang['browse_search']} " . htmlsafechars($searchstr, ENT_QUOTES) . "</h4></div></div>\n";
 }
 if ($count) {
     $HTMLOUT.="<!--<br /><div class='row'><div class='col-md-3 col-md-offset-5'><div style='display:inline-block;width:4px';></div><a href='{$INSTALLER09["baseurl"]}/catalogue.php' class='btn btn-default btn-default'>Search our Catalogue</a></div></div><br /><br />-->". $pager['pagertop'];
@@ -412,10 +425,10 @@ if ($count) {
     $HTMLOUT.= $pager['pagerbottom']."<br />";
 } else {
     if (isset($cleansearchstr)) {
-        $HTMLOUT.= "<div class='row'><div class='col-md-6 col-md-offset-4'><h2>{$lang['browse_not_found']}</h2>";
+        $HTMLOUT.= "<div class='row'><div class='col-md-6 col-md-offset-4'><h4>{$lang['browse_not_found']}</h4>";
         $HTMLOUT.= "{$lang['browse_tryagain']}</div></div>\n";
     } else {
-        $HTMLOUT.= "<div class='row'><div class='col-md-6 col-md-offset-5'><h2>{$lang['browse_nothing']}</h2>\n";
+        $HTMLOUT.= "<div class='row'><div class='col-md-6 col-md-offset-5'><h3>{$lang['browse_nothing']}</h3>\n";
         $HTMLOUT.= "{$lang['browse_sorry']}</div></div>\n";
     }
 }
