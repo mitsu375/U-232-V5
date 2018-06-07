@@ -58,7 +58,7 @@ if ($action == "viewposts") {
 
     $res = sql_query($query) or sqlerr(__FILE__, __LINE__);
     if (mysqli_num_rows($res) == 0) stderr($lang['stderr_errorhead'], $lang['top_noposts']);
-    $HTMLOUT.= "<h1>{$lang['top_posthfor']} $subject</h1>\n";
+    $HTMLOUT.= "<h4>{$lang['top_posthfor']} $subject</h4>\n";
     if ($postcount > $perpage) $HTMLOUT.= $pager['pagertop'];
     //------ Print table
     $HTMLOUT.= begin_main_frame();
@@ -125,7 +125,7 @@ if ($action == "viewcomments") {
     $query = "SELECT $select_is FROM $from_is WHERE $where_is ORDER BY $order_is {$pager['limit']}";
     $res = sql_query($query) or sqlerr(__FILE__, __LINE__);
     if (mysqli_num_rows($res) == 0) stderr($lang['stderr_errorhead'], $lang['top_nocomms']);
-    $HTMLOUT.= "<h1>{$lang['top_commhfor']} $subject</h1>\n";
+    $HTMLOUT.= "<h4>{$lang['top_commhfor']} $subject</h4>\n";
     if ($commentcount > $perpage) $HTMLOUT.= $pager['pagertop'];
     //------ Print table
     $HTMLOUT.= begin_main_frame();
