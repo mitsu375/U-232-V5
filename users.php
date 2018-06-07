@@ -21,6 +21,7 @@ require_once (INCL_DIR . 'user_functions.php');
 dbconn();
 loggedinorreturn();
 $lang = array_merge(load_language('global') , load_language('users'));
+if ($CURUSER['class'] < UC_STAFF) stderr("Error", "It appears that you do not have access to this page.");
 $search = isset($_GET['search']) ? strip_tags(trim($_GET['search'])) : '';
 $class = isset($_GET['class']) ? $_GET['class'] : '-';
 $letter = '';
