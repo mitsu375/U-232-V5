@@ -50,13 +50,15 @@ if ($_hash === $hash) {
     dbconn(false, false);
     if (empty($_user) && ($_do == "stats" || $_do == "torrents" || $_do == "irc")) exit("Can't find the username");
     if ($_do == "stats") {
-        $q = sql_query("SELECT id, username, last_access, downloaded, uploaded, added, status, warned, disable_reason, warn_reason FROM users WHERE username = " . sqlesc($_user)) or exit(((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)));
+        $q = sql_query("SELECT id, username, last_access, downloaded, uploaded, added, status, warned, disable_reason, warn_reason, seedbonus FROM users WHERE username = " . sqlesc($_user)) or exit(((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)));
         if (mysqli_num_rows($q) == 1) {
             $a = mysqli_fetch_assoc($q);
-            $txt = $a["username"] . " is " . ((TIME_NOW - $a["last_access"]) < 300 ? "online" : "offline") . "\nJoined - " . get_date($a["added"], 'LONG', 0, 1) . "\nLast seen - " . get_date($a["last_access"], 'DATE', 0, 1) . "\nDownloaded - " . mksize($a["downloaded"]) . "\nUploaded - " . mksize($a["uploaded"]) . "\n";
-            if ($a["status"] == "disabled") $txt.= "This user is disabled. Reason " . $a["disable_reason"] . "\n";
-            if ($a["warned"] == "yes") $txt.= "This user is warned. Reason " . $a["warn_reason"] . "\n";
-            $txt.= $INSTALLER09['baseurl'] . "/userdetails.php?id=" . $a["id"];
+	    $ratio = (($a["downloaded"] > 0) ? ($a["uploaded"] / $a["downloaded"]) : "0.00");
+	    $txt= $a["username"] . " -- \00310Down:\003 \00304" . mksize($a["downloaded"]) . "\003 \00310Up:\003 \00309" . mksize($a["uploaded"]) . "\003 \00310Ratio:\003 (\00307" . number_format($ratio, 2) . "\003) - " . $INSTALLER09['baseurl'] . "/userdetails.php?id=" . $a["id"] . "\n";
+//            $txt = $a["username"] . " is " . ((TIME_NOW - $a["last_access"]) < 300 ? "online" : "offline") . "\nJoined - " . get_date($a["added"], 'LONG', 0, 1) . "\nLast seen - " . get_date($a["last_access"], 'DATE', 0, 1) . "\nDownloaded - " . mksize($a["downloaded"]) . "\nUploaded - " . mksize($a["uploaded"]) . "\n";
+            if ($a["status"] == "disabled") $txt.= "\00304\002This user is disabled. Reason " . $a["disable_reason"] . "\002\003\n";
+            if ($a["warned"] == "yes") $txt.= "\00308\002This user is warned. Reason " . $a["warn_reason"] . "\002\003\n";
+//            $txt.= $INSTALLER09['baseurl'] . "/userdetails.php?id=" . $a["id"];
             echo ($txt);
         } else exit("User \"" . $_user . "\" not found!");
         unset($txt);
@@ -95,7 +97,7 @@ if ($_hash === $hash) {
         $q = sql_query("SELECT onirc, irctotal,username FROM users WHERE username = " . sqlesc($_user)) or exit(((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)));
         if (mysqli_num_rows($q) == 0) exit("User \"" . $_user . "\" not found!");
         $a = mysqli_fetch_assoc($q);
-        $txt = $a["username"] . " " . ($a["irctotal"] == 0 ? "never been on irc" : "has idled on irc " . calctime($a["irctotal"])) . "\nAnd now he " . ($a["onirc"] == "yes" ? "is" : "isn't") . " on irc";
+        $txt = $a["username"] . " " . ($a["irctotal"] == 0 ? "never been on irc" : "has idled on IRC for \00303" . calctime($a["irctotal"])) . "\003 And " . ($a["onirc"] == "yes" ? "is" : "isn't") . " on IRC";
         echo ($txt);
         unset($a);
         unset($q);
