@@ -155,7 +155,7 @@ document.getElementById(id).select();
     if (isset($_GET['images'])) {
         $folder_month = (!isset($_GET['month']) ? date('m') : ($_GET['month'] < 10 ? '0' : '').(int)$_GET['month']);
         $folder_name = (!isset($_GET['year']) ? date('Y').'/' : (int)$_GET['year'].'/').$folder_month;
-        $bucketlink2 = ((isset($_POST["avy"]) || (isset($_GET['images']) && $_GET['images'] == 2)) ? 'avatars/' : $folder_name.'/');
+        $bucketlink2 = ((isset($_POST["avy"]) || (isset($_GET['images']) && $_GET['images'] == 2)) ? 'avatar/' : $folder_name.'/');
         foreach ((array)glob(($_GET['images'] == 2 ? AVATAR_DIR.'/'.$USERSALT : BITBUCKET_DIR.'/'.$folder_name.'/'.$USERSALT).'_*') as $filename) {
             if (!empty($filename)) {
                 $filename = basename($filename);
