@@ -243,36 +243,10 @@ $visible         = (XBT_TRACKER == true ? "yes" : "no");
 $torrent         = str_replace("_", " ", $torrent);
 $vip             = (isset($_POST["vip"]) ? "1" : "0");
 
-if ($totallen >= 8589934592) $freetorrent = 1;
+//if ($totallen >= 8589934592) $freetorrent = 1;
 
 //IMDB if entered in the form
 $url = strip_tags(isset($_POST['url']) ? trim($_POST['url']) : '');
-//If no IMDB entered lets look in the description for one
-if (empty($url)) {
-    $text = $descr;
-    preg_match_all('/((http|https|ftp):\/\/|www)([a-z0-9\-\._]+)\/?[a-z0-9_\.\-\?\+\/~=&;,]*/si', $text, $match);
-    for ($i = 0; $i < sizeof($match[0]); $i++) {
-        $requestnftest = $match[0][$i];
-        $testurl       = "https://www.imdb.com/title/tt";
-        $testurl1      = "https://uk.imdb.com/title/tt";
-        $testurl2      = "https://imdb.com/title/tt";
-        $testurl3      = "https://us.imdb.com/title/tt";
-        $testurl4      = "https://us.imdb.com/Title?";
-        $test1         = (substr($testurl, 0, 28));
-        $test2         = (substr($testurl1, 0, 27));
-        $test3         = (substr($testurl2, 0, 24));
-        $test4         = (substr($testurl3, 0, 27));
-        $test5         = (substr($testurl4, 0, 25));
-        If (substr($requestnftest, 0, 25) == $test5) {
-            $requestnftest = str_replace("https://us.imdb.com/Title?", 'https://us.imdb.com/title/tt', $requestnftest);
-        }
-        if (substr($requestnftest, 0, 28) == $test1 or substr($requestnftest, 0, 27) == $test2 or substr($requestnftest, 0, 24) == $test3 or substr($requestnftest, 0, 27) == $test4) {
-            $url = trim($requestnftest);
-            $url = sqlesc($requestnftest);
-            $url = strip_tags($requestnftest);
-        }
-    }
-}
 //Last attempt at trying to find the IMDB link for this torrent.  Lets see if we can find it with a search on IMDB using the torrent name
 if (empty($url)) {
     class IMDBSearch1
@@ -305,16 +279,71 @@ if (substr($url, -1) == '/') {
     $url = substr($url, 0, -1);
 }
 
-//if (!$url)
-    //stderr($lang['takeupload_failed'], 'No IMDB Found');
+//If no IMDB entered lets look in the description for one
+if (empty($url)) {
+    $text = $descr;
+    preg_match_all('/((http|https|ftp):\/\/|www)([a-z0-9\-\._]+)\/?[a-z0-9_\.\-\?\+\/~=&;,]*/si', $text, $match);
+    for ($i = 0; $i < sizeof($match[0]); $i++) {
+        $requestnftest = $match[0][$i];
+        $testurl = "https://www.imdb.com/title/tt";
+        $testurl1 = "https://uk.imdb.com/title/tt";
+        $testurl2 = "https://imdb.com/title/tt";
+        $testurl3 = "https://us.imdb.com/title/tt";
+        $testurl4 = "https://us.imdb.com/Title?";
+        $test1 = (substr($testurl, 0, 28));
+        $test2 = (substr($testurl1, 0, 27));
+        $test3 = (substr($testurl2, 0, 24));
+        $test4 = (substr($testurl3, 0, 27));
+        $test5 = (substr($testurl4, 0, 25));
+        If (substr($requestnftest, 0, 25) == $test5) {
+            $requestnftest = str_replace("https://us.imdb.com/Title?", 'https://us.imdb.com/title/tt', $requestnftest);
+        }
+        if (substr($requestnftest, 0, 28) == $test1 or substr($requestnftest, 0, 27) == $test2 or substr($requestnftest, 0, 24) == $test3 or substr($requestnftest, 0, $
+            $url = trim($requestnftest);
+            $url = sqlesc($requestnftest);
+            $url = strip_tags($requestnftest);
+        }
+    }
+}
+$imdb_id_new = 0;
+if (preg_match('(.com/title/tt\d+)', $url, $im_match_imdb) && $url != '') {
+    $imdb_id_new = str_replace(".com/title/tt", "", $im_match_imdb[0]);
+} //preg_match('(.com/title/tt\d+)', $torrents['url'], $im_match_imdb) && $torrents['url'] != ''
 
-//$imdb_info = get_imdb($url);
-//$genre = $imdb_info['gen'];
-//if (!empty($imdb_info['poster'])) {
-//    $poster = $imdb_info['poster'];
-//} else
-//    $poster = strip_tags(isset($_POST['poster']) ? trim($_POST['poster']) : '');
-//END IMDB
+if ($imdb_id_new != 0) {
+    $omdbapi_key = 'change_me'; //Change me to your omdbapi key get @ https://www.omdbapi.com/apikey.aspx
+    $omdbkey = "omdb_takup_" . $imdb_id_new;
+     if (($omdb = $mc1->get_value($omdbkey)) === false) {
+        //==auto imdb rewritten putyn 28/06/2011
+        $imdb = '';
+        $omdb['Title'] = $omdb['Orig_title'] = $omdb['Year'] = $omdb['Actors'] = $omdb['Rating'] = $omdb['Votes'] = $omdb['Genre'] = $omdb['Runtime'] = $omdb['Country'$
+        //            $imdb_info = get_imdb($torrents['url']);
+        $imdb_id = $imdb_id_new;
+        $url_imdb = file_get_contents("https://www.omdbapi.com/?i=tt" . $imdb_id . "&plot=full&r=json&apikey=" . $omdbapi_key);
+        $omdb = json_decode($url_imdb, true);
+        if ($omdb['imdbID'] != '') {
+            $poster = $omdb['Poster'];
+            if ($poster != "N/A") {
+                $omdb['Poster'] = "/imdb/images/" . $imdb_id . ".jpg";
+                if (!file_exists('./imdb/images/' . $imdb_id . '.jpg')) {
+                    @copy("$poster", "./imdb/images/" . $imdb_id . ".jpg");
+                } //!file_exists('./imdb/images/' . $imdb_id . '.jpg')
+                $poster = $omdb['Poster'];
+            } //$poster != "N/A"
+            else {
+                $omdb['Poster'] = "./pic/noposter.jpg";
+            }
+            $mc1->cache_value($omdbkey, $omdb, 10080); // 7 Days
+            if ($omdb['Genre'] != '') {
+                $genre = $omdb['Genre']; // Pull genre from OMDB
+            } //$omdb['Genre'] != ''
+        } //$omdb['imdbID'] != ''
+    } //($omdb = $mc1->get_value($omdbkey)) === false
+} //$torrents['url'] != ''
+
+//END OMDB
+
+//Auto Torrent Mod Check
 if ($CURUSER['id'] != 3) {
     $checked_when = "";
     $checked_by = "";
