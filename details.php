@@ -520,29 +520,31 @@ if (empty($torrents["poster"]) or ($torrents["poster"] == "./pic/noposter.jpg") 
         } //preg_match('(.com/title/tt\d+)', $torrents['url'], $im_match_imdb) && $torrents['url'] != ''
 
         if ($torrents['url'] != '') {
-            //==auto imdb rewritten putyn 28/06/2011
-            $imdb          = '';
-            $omdb['Title'] = $omdb['Orig_title'] = $omdb['Year'] = $omdb['Actors'] = $omdb['Rating'] = $omdb['Votes'] = $omdb['Gen'] = $omdb['Runtime'] = $omdb['Country'] = $omdb['Lanuage'] = $omdb['Director'] = $omdb['Producer'] = $omdb['Writer'] = $omdb['Compose'] = $omdb['Plotoutline'] = $omdb['Plot'] = $omdb['Trailers'] = $omdb['Comment'] = $omdb['imdbRating'] = $omdb['imdbVotes'] = "";
-            //            $imdb_info = get_imdb($torrents['url']);
+	    $omdbkey = "omdb_".$imdb_id_new;
+	    if (($omdb = $mc1->get_value($omdbkey)) === false) {
+                //==auto imdb rewritten putyn 28/06/2011
+                $imdb          = '';
+                $omdb['Title'] = $omdb['Orig_title'] = $omdb['Year'] = $omdb['Actors'] = $omdb['Rating'] = $omdb['Votes'] = $omdb['Gen'] = $omdb['Runtime'] = $omdb['Country'] = $omdb['Lanuage'] = $omdb['Director'] = $omdb['Producer'] = $omdb['Writer'] = $omdb['Compose'] = $omdb['Plotoutline'] = $omdb['Plot'] = $omdb['Trailers'] = $omdb['Comment'] = $omdb['imdbRating'] = $omdb['imdbVotes'] = "";
+                //            $imdb_info = get_imdb($torrents['url']);
 
-            $imdb_id = $imdb_id_new;
+                $imdb_id = $imdb_id_new;
 
-            $url  = file_get_contents("https://www.omdbapi.com/?i=tt" . $imdb_id . "&plot=short&r=json&apikey=" . $omdbapi_key);
-            $omdb = json_decode($url, true);
+                $url  = file_get_contents("https://www.omdbapi.com/?i=tt" . $imdb_id . "&plot=short&r=json&apikey=" . $omdbapi_key);
+                $omdb = json_decode($url, true);
 
-            $poster = $omdb['Poster'];
-            if ($poster !== "N/A") {
                 $poster = $omdb['Poster'];
-                $omdb['Poster'] = "/imdb/images/" . $imdb_id . ".jpg";
-                if (!file_exists('./imdb/images/' . $imdb_id . '.jpg')) {
-                    @copy("$poster", "./imdb/images/" . $imdb_id . ".jpg");
-                } //!file_exists('./imdb/images/' . $imdb_id . '.jpg')
-            } //$poster != "N/A"
-            else {
-                $omdb['Poster'] = "./pic/noposter.jpg";
-            }
-
-
+                if ($poster !== "N/A") {
+                    $poster = $omdb['Poster'];
+                    $omdb['Poster'] = "/imdb/images/" . $imdb_id . ".jpg";
+                    if (!file_exists('./imdb/images/' . $imdb_id . '.jpg')) {
+                        @copy("$poster", "./imdb/images/" . $imdb_id . ".jpg");
+                    } //!file_exists('./imdb/images/' . $imdb_id . '.jpg')
+                } //$poster != "N/A"
+                else {
+                    $omdb['Poster'] = "./pic/noposter.jpg";
+                }
+		$mc1->cache_value($omdbkey, $omdb, 10080); // 7 Days
+	    }
 
             //displaying results
             if ($omdb['Title'] != '') {
